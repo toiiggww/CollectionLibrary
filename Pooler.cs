@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace CollectionLibrary
+namespace TEArts.Etc.CollectionLibrary
 {
     public interface IDentity
     {
         int IDentity { get; }
     }
-    public class Pooler<TEArtType> where TEArtType : IDentity
+    public class Pooler<TEArtsType> where TEArtsType : IDentity
     {
-        private Queue<TEArtType> mbrPooler;
+        private Queue<TEArtsType> mbrPooler;
         private AutoResetEvent mbrEmptyLocker;
         private int mbrIndexer;
         private int mbrStarter;
         private int mbrMaxpean;
         private bool mbrForAbort;
-        public TEArtType Popup()
+        public TEArtsType Popup()
         {
             while (mbrPooler.Count == 0)
             {
@@ -31,7 +28,7 @@ namespace CollectionLibrary
             }
             return mbrPooler.Dequeue();
         }
-        public int Pushin(TEArtType tt)
+        public int Pushin(TEArtsType tt)
         {
             mbrPooler.Enqueue(tt);
             if (mbrPooler.Count >= 1)
@@ -56,7 +53,7 @@ namespace CollectionLibrary
         public int CurrentSize { get { return mbrPooler.Count; } }
         public Pooler(int size, int index, int max)
         {
-            mbrPooler = new Queue<TEArtType>(size);
+            mbrPooler = new Queue<TEArtsType>(size);
             mbrIndexer = index;
             mbrMaxpean = max;
             mbrStarter = index;

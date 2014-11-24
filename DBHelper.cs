@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Data;
-using System.Data.Sql;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
+using System.Data;
 using System.Threading;
 
-namespace CollectionLibrary
+namespace TEArts.Etc.CollectionLibrary
 {
     public delegate void ReaderRecall(IDataReader R);
     public delegate object ReaderRecallReturn(IDataReader R);

@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-
-namespace CollectionLibrary
+using System.IO;
+namespace TEArts.Etc.CollectionLibrary
 {
     public interface IDebugerLoger
     {
+        DebugType DebugType { get; set; }
         void WriteLog(object log, DebugType type);
         void RegistLoger();
     }
-    public enum DebugType { Error, Warning, AuditSuccess, AuditFalue, Info, Debug, FuncationCall }
-    public class ConsoleLoger : IDebugerLoger
+    public enum DebugType { Error, AuditSuccess, AuditFalue, Warning, Info, Debug, FuncationCall }
+    public abstract class DebugerLoger : IDebugerLoger
+    {
+        public virtual DebugType DebugType { get; set; }
+        public virtual void WriteLog(object log, DebugType type) { }
+        public virtual void RegistLoger() { }
+    }
+    public class ConsoleLoger : DebugerLoger
     {
         private ConsoleColor Back { get; set; }
         private ConsoleColor Fore { get; set; }
-        public void WriteLog(object log, DebugType type)
+        public override void WriteLog(object log, DebugType type)
         {
             switch (type)
             {
@@ -56,16 +62,19 @@ namespace CollectionLibrary
             string[] s = log.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             foreach (string l in s)
             {
-                Console.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, type, l));
+                if (type <= DebugType)
+                {
+                    Console.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, type, l));
+                }
             }
             Console.ResetColor();
         }
-        public void RegistLoger()
+        public override void RegistLoger()
         {
             Debuger.Loger.AddLoger("Console",this);
         }
     }
-    public class EventsLoger : IDebugerLoger
+    public class EventsLoger : DebugerLoger
     {
         private static Dictionary<string, System.Diagnostics.EventLog> mbrEvents;
         private System.Diagnostics.EventLog mbrLoger;
@@ -91,28 +100,62 @@ namespace CollectionLibrary
                 mbrLoger = mbrEvents[source];
             }
         }
-        public void WriteLog(object log, DebugType type)
+        public override void WriteLog(object log, DebugType type)
         {
-            mbrLoger.WriteEntry(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, log.ToString()));
+            if (type <= DebugType)
+            {
+                mbrLoger.WriteEntry(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, log.ToString()));
+            }
         }
-        public void RegistLoger()
+        public override void RegistLoger()
         {
             Debuger.Loger.AddLoger("Events", this);
         }
     }
-    public class NetworkLoger : IDebugerLoger
+    public class NetworkLoger : DebugerLoger
     {
         private System.Net.Sockets.Socket mbrSocket;
         public NetworkLoger(System.Net.IPAddress ip, int port, System.Net.Sockets.ProtocolType type)
         {
         }
-        public void WriteLog(object log, DebugType type)
+        public override void WriteLog(object log, DebugType type)
         {
-            mbrSocket.Send(Encoding.UTF8.GetBytes(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, log.ToString())));
+            if (type <= DebugType)
+            {
+                mbrSocket.Send(Encoding.UTF8.GetBytes(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, log.ToString())));
+            }
         }
-        public void RegistLoger()
+        public override void RegistLoger()
         {
             Debuger.Loger.AddLoger("Network", this);
+        }
+    }
+    public class TextFileLoger : DebugerLoger
+    {
+        public TextFileLoger()
+            : this("Application.log")
+        {
+        }
+        public TextFileLoger(string file)
+        {
+            FileName = file;
+            Writer = new StreamWriter(FileName, true, Encoding.UTF8);
+            Writer.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, DebugType.Info, "Logger ready for writting."));
+            Writer.Flush();
+        }
+        public string FileName { get; set; }
+        private TextWriter Writer { get; set; }
+        public override void WriteLog(object log, DebugType type)
+        {
+            if (type <= DebugType)
+            {
+                Writer.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, type, log));
+                Writer.Flush();
+            }
+        }
+        public override void RegistLoger()
+        {
+            Debuger.Loger.AddLoger("TextLoger", this);
         }
     }
     public class Debuger
@@ -145,7 +188,6 @@ namespace CollectionLibrary
         }
         public void DebugInfo(object o, DebugType type)
         {
-#if DEBUG
             lock (mbrDebugHandler)
             {
                 if (o == null)
@@ -164,7 +206,6 @@ namespace CollectionLibrary
                     }
                 }
             }
-#endif
         }
         public void DebugInfo(object o) { DebugInfo(o, DebugType.Info); }
     }

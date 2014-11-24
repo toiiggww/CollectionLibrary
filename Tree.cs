@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace CollectionLibrary
+namespace TEArts.Etc.CollectionLibrary
 {
     #region Tree
     public interface IItem
@@ -93,7 +92,7 @@ namespace CollectionLibrary
         public virtual INode<T, Q> Create(IItem i) { throw new NotImplementedException(); }
         public override string ToString()
         {
-            string r = "", s = "";
+            string s = "";
             //r = (Parent == null ? "+-" : Parent.ToString());
             foreach (var n in Child.Values)
             {

@@ -1,29 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 
-namespace CollectionLibrary
+namespace TEArts.Etc.CollectionLibrary
 {
     public class ConfigService
     {
         internal static string getFile(string node, string file)
         {
-            string s = ConfigurationManager.AppSettings.Get(node);
-            if (string.IsNullOrEmpty(s))
+            //string s = ConfigurationManager.AppSettings.Get(node);
+            string s="";
+            if (ConfigurationManager.AppSettings.AllKeys.Contains<string>(node))
+            {
+                s = ConfigurationManager.AppSettings[node];
+            }
+            else
             {
                 //ConfigurationManager.AppSettings.Set(node, file);
                 //s = file;
-                Configuration cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                ExeConfigurationFileMap cfm = new ExeConfigurationFileMap();
-                cfm.ExeConfigFilename = cfg.FilePath;
-                Configuration cfl = ConfigurationManager.OpenMappedExeConfiguration(cfm, ConfigurationUserLevel.None);
                 //ConfigurationSection cfs = cfg.GetSection("Configure");
+                Configuration cfl = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 cfl.AppSettings.Settings.Add(node, file);
                 cfl.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+                s = file;
             }
             return s;
         }

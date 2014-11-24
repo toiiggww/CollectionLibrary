@@ -1,4 +1,4 @@
-﻿namespace CollectionLibrary
+﻿namespace TEArts.Etc.CollectionLibrary
 {
     partial class Question
     {

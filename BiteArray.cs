@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace CollectionLibrary
+namespace TEArts.Etc.CollectionLibrary
 {
     public abstract class BiteArray
     {
