@@ -11,7 +11,7 @@ namespace TEArts.Etc.CollectionLibrary
         void RegistLoger();
     }
     public enum DebugType { Error, AuditSuccess, AuditFalue, Warning, Info, Debug, FuncationCall }
-    public abstract class DebugerLoger : IDebugerLoger
+    public abstract class DebugerLoger : MarshalByRefObject,IDebugerLoger
     {
         public virtual DebugType DebugType { get; set; }
         public virtual void WriteLog(object log, DebugType type) { }
@@ -169,11 +169,10 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public void AddLoger(string key, IDebugerLoger loger)
         {
-            if (mbrLogers.ContainsKey(key))
+            if (!mbrLogers.ContainsKey(key))
             {
-                throw new ArgumentException(string.Format("[{0}] is already added", key));
+                mbrLogers.Add(key, loger);
             }
-            mbrLogers.Add(key, loger);
         }
         public static Debuger Loger
         {
@@ -186,17 +185,13 @@ namespace TEArts.Etc.CollectionLibrary
                 return mbrInstance;
             }
         }
-        public void DebugInfo(object o, DebugType type)
+        private void DebugInfoInternal(object o, DebugType type)
         {
             lock (mbrDebugHandler)
             {
                 if (o == null)
                 {
-                    DebugInfo("====]> NULL <[====", type);
-                }
-                else if (o.GetType() == typeof(byte[]))
-                {
-                    DebugInfo(BiteArray.FormatArrayMatrix(o as byte[]), type);
+                    DebugInfoInternal("====]> NULL <[====", type);
                 }
                 else
                 {
@@ -207,6 +202,22 @@ namespace TEArts.Etc.CollectionLibrary
                 }
             }
         }
-        public void DebugInfo(object o) { DebugInfo(o, DebugType.Info); }
+        public void DebugInfo(DebugType type, byte[] message)
+        {
+            DebugInfoInternal(BiteArray.FormatArrayMatrix(message) as object, type);
+        }
+        public void DebugInfo(DebugType type, string message)
+        {
+            DebugInfoInternal(message, type);
+        }
+        public void DebugInfo(string formater, params object[] args)
+        {
+            DebugInfo(DebugType.Info, formater, args);
+        }
+        public void DebugInfo(DebugType type,string formater, params object [] args)
+        {
+            DebugInfoInternal(string.Format(formater, args), type);
+        }
+        public void DebugInfo(object o) { DebugInfoInternal(o, DebugType.Info); }
     }
 }
