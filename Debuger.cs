@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 namespace TEArts.Etc.CollectionLibrary
 {
     public interface IDebugerLoger
@@ -13,12 +13,32 @@ namespace TEArts.Etc.CollectionLibrary
     public enum DebugType { Error, AuditSuccess, AuditFalue, Warning, Info, Debug, FuncationCall }
     public abstract class DebugerLoger : MarshalByRefObject,IDebugerLoger
     {
+        public DebugerLoger()
+        {
+            DebugType = CollectionLibrary.DebugType.Debug;
+        }
         public virtual DebugType DebugType { get; set; }
         public virtual void WriteLog(object log, DebugType type) { }
         public virtual void RegistLoger() { }
     }
     public class ConsoleLoger : DebugerLoger
     {
+        private ConsoleLoger()
+        {
+
+        }
+        private static ConsoleLoger mbrInstance;
+        public static ConsoleLoger Instance
+        {
+            get
+            {
+                if (mbrInstance == null)
+                {
+                    mbrInstance = new ConsoleLoger();
+                }
+                return mbrInstance;
+            }
+        }
         private ConsoleColor Back { get; set; }
         private ConsoleColor Fore { get; set; }
         public override void WriteLog(object log, DebugType type)
@@ -195,6 +215,10 @@ namespace TEArts.Etc.CollectionLibrary
                 }
                 else
                 {
+                    if (mbrLogers.Count == 0)
+                    {
+                        ConsoleLoger.Instance.RegistLoger();
+                    }
                     foreach (IDebugerLoger l in mbrLogers.Values)
                     {
                         l.WriteLog(o, type);
@@ -212,7 +236,7 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public void DebugInfo(string formater, params object[] args)
         {
-            DebugInfo(DebugType.Info, formater, args);
+            DebugInfo(DebugType.Info, formater == null ? "" : formater, args);
         }
         public void DebugInfo(DebugType type,string formater, params object [] args)
         {
