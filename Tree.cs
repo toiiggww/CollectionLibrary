@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TEArts.Etc.CollectionLibrary
 {
@@ -116,6 +116,7 @@ namespace TEArts.Etc.CollectionLibrary
         where Q : IItem
     {
         public Tree() { }
+        public Tree(INode<T,Q> root) : this() { Root = root; }
         public virtual INode<T, Q> Root { get; internal set; }
         public override string ToString()
         {

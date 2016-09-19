@@ -5,18 +5,18 @@ namespace TEArts.Etc.CollectionLibrary
 {
     public abstract class BiteArray
     {
-        public static short GetInt16(byte[] bytes, int offset)
+        public static short GetShort(byte[] bytes, int offset)
         {
             if (offset + 1 <= bytes.Length)
             {
-                return GetInt16(new byte[] { bytes[offset], bytes[offset + 1] });
+                return GetShort(new byte[] { bytes[offset], bytes[offset + 1] });
             }
             else
             {
                 throw new ArgumentException("Array");
             }
         }
-        public static short GetInt16(byte[] bytes)
+        public static short GetShort(byte[] bytes)
         {
             if (bytes.Length == 2)
             {
@@ -42,7 +42,7 @@ namespace TEArts.Etc.CollectionLibrary
             {
                 throw new IndexOutOfRangeException(offset.ToString());
             }
-            int s = GetInt32(new byte[] { bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3] });
+            int s = GetInt(new byte[] { bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3] });
             if (s == 0)
             {
                 return "";
@@ -60,18 +60,18 @@ namespace TEArts.Etc.CollectionLibrary
                 throw new ArgumentOutOfRangeException("array");
             }
         }
-        public static int GetInt32(byte[] bytes, int offset)
+        public static int GetInt(byte[] bytes, int offset)
         {
             if (offset + 3 <= bytes.Length)
             {
-                return GetInt32(new byte[] { bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3] });
+                return GetInt(new byte[] { bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3] });
             }
             else
             {
                 throw new ArgumentOutOfRangeException("array");
             }
         }
-        public static int GetInt32(byte[] bytes)
+        public static int GetInt(byte[] bytes)
         {
             if (bytes.Length == 4)
             {
@@ -91,7 +91,7 @@ namespace TEArts.Etc.CollectionLibrary
                 throw new ArgumentException("Array");
             }
         }
-        public static long GetInt64(byte[] bytes)
+        public static long GetLong(byte[] bytes)
         {
             if (bytes.Length == 8)
             {
@@ -119,11 +119,11 @@ namespace TEArts.Etc.CollectionLibrary
                 throw new ArgumentException("Array");
             }
         }
-        public static long GetInt64(byte[] bytes, int offset)
+        public static long GetLong(byte[] bytes, int offset)
         {
             if (offset + 8 <= bytes.Length)
             {
-                return GetInt64(
+                return GetLong(
                     new byte[]
                 {
                 bytes[offset+0],
@@ -192,11 +192,11 @@ namespace TEArts.Etc.CollectionLibrary
             {
                 throw new IndexOutOfRangeException(string.Format("Offset {0} Out of array length {1}", offset, bytes.Length));
             }
-            if (offset+length>bytes.Length)
+            if (offset + length > bytes.Length)
             {
-                length = bytes.Length - offset;
+                length = bytes.Length - offset - 4;
             }
-            return encode.GetString(bytes, offset, length);
+            return encode.GetString(bytes, offset + 4, length);
         }
         public static float GetFloat(byte[] bytes)
         {
@@ -326,7 +326,12 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public static byte[] GetBytes(string s)
         {
-            return Concate(BitConverter.GetBytes(s.Length), Encoding.ASCII.GetBytes(s));
+            return GetBytes(s, Encoding.ASCII);
+        }
+        public static byte[] GetBytes(string s, Encoding encode)
+        {
+            byte[] bs = encode.GetBytes(s);
+            return Concate(BitConverter.GetBytes(bs.Length), bs);
         }
         private static byte[] GetArray(object l) { return Encoding.ASCII.GetBytes(string.Format("{0:2X}", l)); }
         public static byte[] Concate(byte[] bytes1, byte[] bytes2)
@@ -474,7 +479,7 @@ namespace TEArts.Etc.CollectionLibrary
         public static int GetInt32BE(byte[] bytes)
         {
             Array.Reverse(bytes);
-            return GetInt32(bytes);
+            return GetInt(bytes);
         }
     }
 }

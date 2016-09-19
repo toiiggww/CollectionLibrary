@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace TEArts.Etc.CollectionLibrary
@@ -14,20 +15,31 @@ namespace TEArts.Etc.CollectionLibrary
         private int mbrIndexer;
         private int mbrStarter;
         private int mbrMaxpean;
+        private int waiteTime { get; set; }
         private bool mbrForAbort;
         public TEArtsType Popup()
         {
-            while (mbrPooler.Count == 0)
+            while (mbrPooler.Count == 0 && waiteTime <= 0)
             {
                 mbrEmptyLocker.Reset();
-                mbrEmptyLocker.WaitOne();
+                if (waiteTime <= 0)
+                {
+                    mbrEmptyLocker.WaitOne();
+                }
+                else
+                {
+                    mbrEmptyLocker.WaitOne(waiteTime);
+                }
                 if (mbrForAbort)
                 {
                     Thread.CurrentThread.Abort();
                 }
             }
-            return mbrPooler.Dequeue();
+            waiteTime = -1;
+            try { return mbrPooler.Dequeue(); }
+            catch { return default(TEArtsType); }
         }
+        public TEArtsType PopupNow( ) { waiteTime = 10; mbrEmptyLocker.Set(); return Popup(); }
         public int Pushin(TEArtsType tt)
         {
             mbrPooler.Enqueue(tt);
@@ -61,5 +73,12 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public Pooler(int size, int index) : this(size, index, int.MaxValue) { }
         public Pooler(int size) : this(size, int.MinValue + 1, int.MaxValue) { }
+
+        public TEArtsType[] CopyTo()
+        {
+            TEArtsType[] r = new TEArtsType[mbrPooler.Count];
+            mbrPooler.CopyTo(r, 0);
+            return r;
+        }
     }
 }

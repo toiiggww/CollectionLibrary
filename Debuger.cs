@@ -27,6 +27,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
 
         }
+        private static object mbrOutLocker = new object();
         private static ConsoleLoger mbrInstance;
         public static ConsoleLoger Instance
         {
@@ -43,51 +44,60 @@ namespace TEArts.Etc.CollectionLibrary
         private ConsoleColor Fore { get; set; }
         public override void WriteLog(object log, DebugType type)
         {
-            switch (type)
+            lock (mbrOutLocker)
             {
-                case DebugType.Error:
-                    Back = ConsoleColor.Red;
-                    Fore = ConsoleColor.White;
-                    break;
-                case DebugType.Warning:
-                    Back = ConsoleColor.Yellow;
-                    Fore = ConsoleColor.Red;
-                    break;
-                case DebugType.AuditSuccess:
-                    Back = ConsoleColor.DarkGray;
-                    Fore = ConsoleColor.White;
-                    break;
-                case DebugType.AuditFalue:
-                    Back = ConsoleColor.DarkRed;
-                    Fore = ConsoleColor.DarkYellow;
-                    break;
-                case DebugType.Info:
-                    Console.ResetColor();
-                    Back = Console.BackgroundColor;
-                    Fore = Console.ForegroundColor;
-                    break;
-                case DebugType.Debug:
-                    Back = ConsoleColor.Gray;
-                    Fore = ConsoleColor.DarkGreen;
-                    break;
-                case DebugType.FuncationCall:
-                    Back = ConsoleColor.Gray;
-                    Fore = ConsoleColor.Yellow;
-                    break;
-                default:
-                    break;
-            }
-            Console.BackgroundColor = Back;
-            Console.ForegroundColor = Fore;
-            string[] s = log.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            foreach (string l in s)
-            {
-                if (type <= DebugType)
+                switch (type)
                 {
-                    Console.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, type, l));
+                    case DebugType.Error:
+                        Back = ConsoleColor.Red;
+                        Fore = ConsoleColor.White;
+                        break;
+                    case DebugType.Warning:
+                        Back = ConsoleColor.Yellow;
+                        Fore = ConsoleColor.Red;
+                        break;
+                    case DebugType.AuditSuccess:
+                        Back = ConsoleColor.DarkGray;
+                        Fore = ConsoleColor.White;
+                        break;
+                    case DebugType.AuditFalue:
+                        Back = ConsoleColor.DarkRed;
+                        Fore = ConsoleColor.DarkYellow;
+                        break;
+                    case DebugType.Info:
+                        Console.ResetColor();
+                        Back = Console.BackgroundColor;
+                        Fore = Console.ForegroundColor;
+                        break;
+                    case DebugType.Debug:
+                        Back = ConsoleColor.Gray;
+                        Fore = ConsoleColor.DarkGreen;
+                        break;
+                    case DebugType.FuncationCall:
+                        Back = ConsoleColor.Gray;
+                        Fore = ConsoleColor.Yellow;
+                        break;
+                    default:
+                        break;
                 }
+                Console.BackgroundColor = Back;
+                Console.ForegroundColor = Fore;
+                string[] s = log.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                //foreach (string l in s)
+                //{
+                //    if (type <= DebugType)
+                //    {
+                //        Console.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, type, l));
+                //    }
+                //}
+                for (int i = 0; i < s.Length - 1; i++)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}", DateTime.Now, type, s[i]);
+                }
+                Console.Write("{0}\t{1}\t{2}", DateTime.Now, type, s[s.Length - 1]);
+                Console.ResetColor();
+                Console.WriteLine();
             }
-            Console.ResetColor();
         }
         public override void RegistLoger()
         {
