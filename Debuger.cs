@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
+
 namespace TEArts.Etc.CollectionLibrary
 {
     public interface IDebugerLoger
@@ -65,9 +68,8 @@ namespace TEArts.Etc.CollectionLibrary
                         Fore = ConsoleColor.DarkYellow;
                         break;
                     case DebugType.Info:
-                        Console.ResetColor();
-                        Back = Console.BackgroundColor;
-                        Fore = Console.ForegroundColor;
+                        Back = ConsoleColor.Black;
+                        Fore = ConsoleColor.White;
                         break;
                     case DebugType.Debug:
                         Back = ConsoleColor.Gray;
@@ -95,7 +97,8 @@ namespace TEArts.Etc.CollectionLibrary
                     Console.WriteLine("{0}\t{1}\t{2}", DateTime.Now, type, s[i]);
                 }
                 Console.Write("{0}\t{1}\t{2}", DateTime.Now, type, s[s.Length - 1]);
-                Console.ResetColor();
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine();
             }
         }
@@ -217,6 +220,18 @@ namespace TEArts.Etc.CollectionLibrary
         }
         private void DebugInfoInternal(object o, DebugType type)
         {
+            ParameterizedThreadStart opt = new ParameterizedThreadStart(outputThread);
+            object[] args = new object[] { o, type };
+            Thread td = new Thread(opt);
+            td.Start(args);
+        }
+
+        private void outputThread(object args)
+        {
+            object o = (args as object[])[0];
+            DebugType type = ((DebugType)((args as object[])[1]));
+
+            //Console.WriteLine((new System.Diagnostics.StackTrace()).ToString());
             lock (mbrDebugHandler)
             {
                 if (o == null)
@@ -229,6 +244,24 @@ namespace TEArts.Etc.CollectionLibrary
                     {
                         ConsoleLoger.Instance.RegistLoger();
                     }
+
+                    if (type == DebugType.Error || type == DebugType.FuncationCall)
+                    {
+                        string [] stk = new StackTrace(2, true).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (IDebugerLoger l in mbrLogers.Values)
+                        {
+                            l.WriteLog(o, type);
+                        }
+                    }
+                    else if (type == DebugType.Warning)
+                    {
+                        string [] stk = new StackTrace(2, false).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (IDebugerLoger l in mbrLogers.Values)
+                        {
+                            l.WriteLog(o, type);
+                        }
+                    }
+
                     foreach (IDebugerLoger l in mbrLogers.Values)
                     {
                         l.WriteLog(o, type);
@@ -236,6 +269,7 @@ namespace TEArts.Etc.CollectionLibrary
                 }
             }
         }
+
         public void DebugInfo(DebugType type, byte[] message)
         {
             DebugInfoInternal(BiteArray.FormatArrayMatrix(message) as object, type);

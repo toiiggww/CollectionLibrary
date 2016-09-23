@@ -42,6 +42,15 @@ namespace TEArts.Etc.CollectionLibrary
         public TimedItem<TEArtsType> Add(TEArtsType item, long mill, Action<TEArtsType> onTimeOut)
         {
             TimedItem<TEArtsType> i = new TimedItem<TEArtsType>(Millisecond);
+            return Add(i);
+        }
+        public TimedItem<TEArtsType> Add(TimedItem<TEArtsType> i)
+        {
+            if (i.TimeOut <= DateTime.Now)
+            {
+                i.ResetTime();
+            }
+            long m = (long)((i.TimeOut - DateTime.Now).TotalMilliseconds);
             List<TimedItem<TEArtsType>> ts = null;
             lock (List)
             {
@@ -56,11 +65,12 @@ namespace TEArts.Etc.CollectionLibrary
                 ts.Add(i);
                 if (Next > i.TimeOut)
                 {
-                    Timer.Change(mill, Timeout.Infinite);
+                    Timer.Change(m, Timeout.Infinite);
                 }
             }
             return i;
         }
+
         public void Remove(TimedItem<TEArtsType> item)
         {
             lock (List)
@@ -94,7 +104,22 @@ namespace TEArts.Etc.CollectionLibrary
     {
         public TimedItem(double millisecond)
         {
+            if (millisecond < 0) millisecond = 50;
             TimeOut = DateTime.Now.AddMilliseconds(millisecond);
+        }
+        public TimedItem(TEArtsType value, DateTime timeout, Action<TEArtsType> action)
+        {
+            Item = value;
+            Callback = action;
+            if (timeout < DateTime.Now)
+            {
+                timeout = DateTime.Now.AddMilliseconds(50);
+            }
+            TimeOut = timeout;
+        }
+        internal void ResetTime()
+        {
+            TimeOut = DateTime.Now.AddMilliseconds(50);
         }
         public TEArtsType Item { get; private set; }
         public DateTime TimeOut { get; private set; }
