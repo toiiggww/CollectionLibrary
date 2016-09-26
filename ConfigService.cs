@@ -7,7 +7,7 @@ namespace TEArts.Etc.CollectionLibrary
 {
     public class ConfigService
     {
-        internal static string getFile(string node, string file)
+        public static string ReadAppConfig(string node, string file)
         {
             //string s = ConfigurationManager.AppSettings.Get(node);
             string s="";
@@ -32,7 +32,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
             try
             {
-                string f = getFile(node, file);
+                string f = ReadAppConfig(node, file);
                 using (TextReader tr = ((TextReader)(new StreamReader(f))))
                 {
                     f = tr.ReadToEnd();
@@ -50,7 +50,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
             try
             {
-                using (TextWriter tr = new StreamWriter(getFile(node, file)))
+                using (TextWriter tr = new StreamWriter(ReadAppConfig(node, file)))
                 {
                     tr.Write(JsonConvert.SerializeObject(config));
                     tr.Flush();

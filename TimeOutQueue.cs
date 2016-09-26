@@ -24,8 +24,17 @@ namespace TEArts.Etc.CollectionLibrary
                 List<TimedItem<TEArtsType>> t = List[dt];
                 foreach (TimedItem<TEArtsType> tt in t)
                 {
-                    tt.Callback(tt.Item);
+                    if (tt.NextTimer < 0)
+                    {
+                        tt.Callback(tt.Item);
+                    }
+                    else
+                    {
+                        tt.NextTimer -= long.MaxValue;
+                        Add(tt);
+                    }
                 }
+                t.Clear();
                 List.Remove(dt);
                 nextTimer();
             }, Next, Timeout.Infinite, Timeout.Infinite);
@@ -50,7 +59,17 @@ namespace TEArts.Etc.CollectionLibrary
             {
                 i.ResetTime();
             }
-            long m = (long)((i.TimeOut - DateTime.Now).TotalMilliseconds);
+            long m = 0;
+            TimeSpan t = (i.TimeOut - DateTime.Now);
+            if (t.TotalMilliseconds > long.MaxValue)
+            {
+                m = long.MaxValue;
+                i.NextTimer = t.TotalMilliseconds - long.MaxValue;
+            }
+            else
+            {
+                m = (long)(t.TotalMilliseconds);
+            }
             List<TimedItem<TEArtsType>> ts = null;
             lock (List)
             {
@@ -93,6 +112,11 @@ namespace TEArts.Etc.CollectionLibrary
                 Timer.Change(Timeout.Infinite, Timeout.Infinite);
             }
         }
+        public void Clear()
+        {
+            List.Clear();
+            nextTimer();
+        }
         public void Dispose()
         {
             Timer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -106,6 +130,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
             if (millisecond < 0) millisecond = 50;
             TimeOut = DateTime.Now.AddMilliseconds(millisecond);
+            NextTimer = -1;
         }
         public TimedItem(TEArtsType value, DateTime timeout, Action<TEArtsType> action)
         {
@@ -116,11 +141,13 @@ namespace TEArts.Etc.CollectionLibrary
                 timeout = DateTime.Now.AddMilliseconds(50);
             }
             TimeOut = timeout;
+            NextTimer = -1;
         }
         internal void ResetTime()
         {
             TimeOut = DateTime.Now.AddMilliseconds(50);
         }
+        internal double NextTimer { get; set; }
         public TEArtsType Item { get; private set; }
         public DateTime TimeOut { get; private set; }
         public Action<TEArtsType> Callback { get; private set; }

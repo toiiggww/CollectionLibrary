@@ -13,7 +13,7 @@ namespace TEArts.Etc.CollectionLibrary
         void WriteLog(object log, DebugType type);
         void RegistLoger();
     }
-    public enum DebugType { Error, AuditSuccess, AuditFalue, Warning, Info, Debug, FuncationCall }
+    public enum DebugType { Error, AuditSuc, AuditFal, Warnning, Info, Debug, FunCall }
     public abstract class DebugerLoger : MarshalByRefObject,IDebugerLoger
     {
         public DebugerLoger()
@@ -55,15 +55,15 @@ namespace TEArts.Etc.CollectionLibrary
                         Back = ConsoleColor.Red;
                         Fore = ConsoleColor.White;
                         break;
-                    case DebugType.Warning:
+                    case DebugType.Warnning:
                         Back = ConsoleColor.Yellow;
                         Fore = ConsoleColor.Red;
                         break;
-                    case DebugType.AuditSuccess:
+                    case DebugType.AuditSuc:
                         Back = ConsoleColor.DarkGray;
                         Fore = ConsoleColor.White;
                         break;
-                    case DebugType.AuditFalue:
+                    case DebugType.AuditFal:
                         Back = ConsoleColor.DarkRed;
                         Fore = ConsoleColor.DarkYellow;
                         break;
@@ -75,7 +75,7 @@ namespace TEArts.Etc.CollectionLibrary
                         Back = ConsoleColor.Gray;
                         Fore = ConsoleColor.DarkGreen;
                         break;
-                    case DebugType.FuncationCall:
+                    case DebugType.FunCall:
                         Back = ConsoleColor.Gray;
                         Fore = ConsoleColor.Yellow;
                         break;
@@ -218,19 +218,11 @@ namespace TEArts.Etc.CollectionLibrary
                 return mbrInstance;
             }
         }
+
+        public bool ViewStackTrace { get; set; }
+
         private void DebugInfoInternal(object o, DebugType type)
         {
-            ParameterizedThreadStart opt = new ParameterizedThreadStart(outputThread);
-            object[] args = new object[] { o, type };
-            Thread td = new Thread(opt);
-            td.Start(args);
-        }
-
-        private void outputThread(object args)
-        {
-            object o = (args as object[])[0];
-            DebugType type = ((DebugType)((args as object[])[1]));
-
             //Console.WriteLine((new System.Diagnostics.StackTrace()).ToString());
             lock (mbrDebugHandler)
             {
@@ -244,21 +236,29 @@ namespace TEArts.Etc.CollectionLibrary
                     {
                         ConsoleLoger.Instance.RegistLoger();
                     }
-
-                    if (type == DebugType.Error || type == DebugType.FuncationCall)
+                    if (ViewStackTrace)
                     {
-                        string [] stk = new StackTrace(2, true).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (IDebugerLoger l in mbrLogers.Values)
+                        if (type == DebugType.Error || type == DebugType.FunCall)
                         {
-                            l.WriteLog(o, type);
+                            string[] stk = new StackTrace(2, true).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (IDebugerLoger l in mbrLogers.Values)
+                            {
+                                foreach (string str in stk)
+                                {
+                                    l.WriteLog(str, type);
+                                }
+                            }
                         }
-                    }
-                    else if (type == DebugType.Warning)
-                    {
-                        string [] stk = new StackTrace(2, false).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (IDebugerLoger l in mbrLogers.Values)
+                        else if (type == DebugType.Warnning)
                         {
-                            l.WriteLog(o, type);
+                            string[] stk = new StackTrace(2, false).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (IDebugerLoger l in mbrLogers.Values)
+                            {
+                                foreach (string str in stk)
+                                {
+                                    l.WriteLog(str, type);
+                                }
+                            }
                         }
                     }
 
@@ -269,7 +269,6 @@ namespace TEArts.Etc.CollectionLibrary
                 }
             }
         }
-
         public void DebugInfo(DebugType type, byte[] message)
         {
             DebugInfoInternal(BiteArray.FormatArrayMatrix(message) as object, type);
@@ -287,5 +286,13 @@ namespace TEArts.Etc.CollectionLibrary
             DebugInfoInternal(string.Format(formater, args), type);
         }
         public void DebugInfo(object o) { DebugInfoInternal(o, DebugType.Info); }
+        public void Error(string formater, params object[] args)
+        {
+            DebugInfo(DebugType.Error, formater, args);
+        }
+        public void Warning(string formater, params object[] args)
+        {
+            DebugInfo(DebugType.Warnning, formater, args);
+        }
     }
 }
