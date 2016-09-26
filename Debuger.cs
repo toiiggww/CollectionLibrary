@@ -220,17 +220,6 @@ namespace TEArts.Etc.CollectionLibrary
         }
         private void DebugInfoInternal(object o, DebugType type)
         {
-            ParameterizedThreadStart opt = new ParameterizedThreadStart(outputThread);
-            object[] args = new object[] { o, type };
-            Thread td = new Thread(opt);
-            td.Start(args);
-        }
-
-        private void outputThread(object args)
-        {
-            object o = (args as object[])[0];
-            DebugType type = ((DebugType)((args as object[])[1]));
-
             //Console.WriteLine((new System.Diagnostics.StackTrace()).ToString());
             lock (mbrDebugHandler)
             {
@@ -247,7 +236,7 @@ namespace TEArts.Etc.CollectionLibrary
 
                     if (type == DebugType.Error || type == DebugType.FuncationCall)
                     {
-                        string [] stk = new StackTrace(2, true).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] stk = new StackTrace(2, true).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (IDebugerLoger l in mbrLogers.Values)
                         {
                             l.WriteLog(o, type);
@@ -255,7 +244,7 @@ namespace TEArts.Etc.CollectionLibrary
                     }
                     else if (type == DebugType.Warning)
                     {
-                        string [] stk = new StackTrace(2, false).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] stk = new StackTrace(2, false).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (IDebugerLoger l in mbrLogers.Values)
                         {
                             l.WriteLog(o, type);
@@ -269,7 +258,6 @@ namespace TEArts.Etc.CollectionLibrary
                 }
             }
         }
-
         public void DebugInfo(DebugType type, byte[] message)
         {
             DebugInfoInternal(BiteArray.FormatArrayMatrix(message) as object, type);
@@ -287,5 +275,13 @@ namespace TEArts.Etc.CollectionLibrary
             DebugInfoInternal(string.Format(formater, args), type);
         }
         public void DebugInfo(object o) { DebugInfoInternal(o, DebugType.Info); }
+        public void Error(string formater, params object[] args)
+        {
+            DebugInfo(DebugType.Error, formater, args);
+        }
+        public void Warning(string formater, params object[] args)
+        {
+            DebugInfo(DebugType.Warning, formater, args);
+        }
     }
 }
