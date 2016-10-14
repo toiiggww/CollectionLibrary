@@ -13,7 +13,7 @@ namespace TEArts.Etc.CollectionLibrary
         void WriteLog(object log, DebugType type);
         void RegistLoger();
     }
-    public enum DebugType { Error, AuditSuc, AuditFal, Warnning, Info, Debug, FunCall }
+    public enum DebugType { Error, AuditSuc, AuditFal, Warning, Info, Debug, FunCall }
     public abstract class DebugerLoger : MarshalByRefObject,IDebugerLoger
     {
         public DebugerLoger()
@@ -55,7 +55,7 @@ namespace TEArts.Etc.CollectionLibrary
                         Back = ConsoleColor.Red;
                         Fore = ConsoleColor.White;
                         break;
-                    case DebugType.Warnning:
+                    case DebugType.Warning:
                         Back = ConsoleColor.Yellow;
                         Fore = ConsoleColor.Red;
                         break;
@@ -249,7 +249,7 @@ namespace TEArts.Etc.CollectionLibrary
                                 }
                             }
                         }
-                        else if (type == DebugType.Warnning)
+                        else if (type == DebugType.Warning)
                         {
                             string[] stk = new StackTrace(2, false).ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                             foreach (IDebugerLoger l in mbrLogers.Values)
@@ -283,7 +283,18 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public void DebugInfo(DebugType type,string formater, params object [] args)
         {
-            DebugInfoInternal(string.Format(formater, args), type);
+            try
+            {
+                DebugInfoInternal(string.Format(formater, args), type);
+            }
+            catch
+            {
+                DebugInfoInternal(formater.Replace("{", "{{").Replace("}", "}}"), type);
+                foreach (object o in args)
+                {
+                    DebugInfoInternal(o, type);
+                }
+            }
         }
         public void DebugInfo(object o) { DebugInfoInternal(o, DebugType.Info); }
         public void Error(string formater, params object[] args)
@@ -292,7 +303,7 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public void Warning(string formater, params object[] args)
         {
-            DebugInfo(DebugType.Warnning, formater, args);
+            DebugInfo(DebugType.Warning, formater, args);
         }
     }
 }

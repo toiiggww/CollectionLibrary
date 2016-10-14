@@ -7,7 +7,7 @@ namespace TEArts.Etc.CollectionLibrary
 {
     public class ConfigService
     {
-        public static string ReadAppConfig(string node, string file)
+        public static string ReadAppConfig(string node, string value)
         {
             //string s = ConfigurationManager.AppSettings.Get(node);
             string s="";
@@ -20,13 +20,23 @@ namespace TEArts.Etc.CollectionLibrary
                 //ConfigurationManager.AppSettings.Set(node, file);
                 //s = file;
                 //ConfigurationSection cfs = cfg.GetSection("Configure");
-                Configuration cfl = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                cfl.AppSettings.Settings.Add(node, file);
-                cfl.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
-                s = file;
+                s = value;
             }
             return s;
+        }
+        public static void SaveAppConfig(string node, string value)
+        {
+            if (ConfigurationManager.AppSettings.AllKeys.Contains<string>(node))
+            {
+                ConfigurationManager.AppSettings[node] = value;
+            }
+            else
+            {
+                Configuration cfl = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                cfl.AppSettings.Settings.Add(node, value);
+                cfl.Save(ConfigurationSaveMode.Modified);
+            }
+            ConfigurationManager.RefreshSection("appSettings");
         }
         public static T readConfig<T>(string node, string file)
         {

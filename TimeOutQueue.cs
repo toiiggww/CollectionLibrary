@@ -98,6 +98,10 @@ namespace TEArts.Etc.CollectionLibrary
                 {
                     List[item.TimeOut].Remove(item);
                 }
+                if (List[item.TimeOut].Count == 0)
+                {
+                    nextTimer();
+                }
             }
         }
         private void nextTimer()
