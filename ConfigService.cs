@@ -38,7 +38,7 @@ namespace TEArts.Etc.CollectionLibrary
             }
             ConfigurationManager.RefreshSection("appSettings");
         }
-        public static T readConfig<T>(string node, string file)
+        public static T ReadConfig<T>(string node, string file, T value)
         {
             try
             {
@@ -53,10 +53,10 @@ namespace TEArts.Etc.CollectionLibrary
             }
             catch
             {
-                return default(T);
+                return value;
             }
         }
-        public static bool saveConfig<T>(T config, string node, string file)
+        public static bool SaveConfig<T>(T config, string node, string file)
         {
             try
             {

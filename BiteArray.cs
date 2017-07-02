@@ -384,6 +384,25 @@ namespace TEArts.Etc.CollectionLibrary
             return GetArray(s);
             //}
         }
+        public static string ToString(byte[] bytes, string splite = " ")
+        {
+            string r = string.Empty;
+            bool flag = bytes == null;
+            string result;
+            if (flag)
+            {
+                result = "]NULL[";
+            }
+            else
+            {
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    r = string.Format("{0}{1}{2}", r, bytes[i]);
+                }
+                result = r;
+            }
+            return result;
+        }
         public static byte[] FromString(string str)
         {
             return FromString(str, "");

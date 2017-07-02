@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Reflection;
 using System.Threading;
 
 namespace TEArts.Etc.CollectionLibrary
@@ -14,7 +15,7 @@ namespace TEArts.Etc.CollectionLibrary
         void RegistLoger();
     }
     public enum DebugType { Error, AuditSuc, AuditFal, Warning, Info, Debug, FunCall }
-    public abstract class DebugerLoger : MarshalByRefObject,IDebugerLoger
+    public abstract class DebugerLoger : MarshalByRefObject, IDebugerLoger
     {
         public DebugerLoger()
         {
@@ -23,6 +24,29 @@ namespace TEArts.Etc.CollectionLibrary
         public virtual DebugType DebugType { get; set; }
         public virtual void WriteLog(object log, DebugType type) { }
         public virtual void RegistLoger() { }
+        public static int ObjectDeeps { get; set; } = 3;
+        public static string BuildLog(object o, int level = 0)
+        {
+            if (level > ObjectDeeps)
+            {
+                return o.ToString();
+            }
+            if (o.IsBaseType())
+            {
+                return o.ToString();
+            }
+            StringBuilder sb = new StringBuilder();
+            level++;
+            Type t = o.GetType();
+            PropertyInfo[] ps = t.GetProperties();
+            sb.AppendFormat("{0}Type : {0}", '\t'.Repeat(level), t.FullName);
+            string generic = string.Empty;
+            foreach (PropertyInfo p in ps)
+            {
+                sb.AppendFormat("{0}{1} {2} {3}", '\t'.Repeat(level), p.DeclaringType.GenericDeclare(), p.Name, p.DeclaringType.IsBaseType() ? p.GetValue(o, null) : Environment.NewLine + BuildLog(p.GetValue(o, null), level + 1));
+            }
+            return sb.ToString();
+        }
     }
     public class ConsoleLoger : DebugerLoger
     {
@@ -84,7 +108,7 @@ namespace TEArts.Etc.CollectionLibrary
                 }
                 Console.BackgroundColor = Back;
                 Console.ForegroundColor = Fore;
-                string[] s = log.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                string[] s = BuildLog(log).Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 //foreach (string l in s)
                 //{
                 //    if (type <= DebugType)
@@ -137,7 +161,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
             if (type <= DebugType)
             {
-                mbrLoger.WriteEntry(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, log.ToString()));
+                mbrLoger.WriteEntry(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, BuildLog(log)));
             }
         }
         public override void RegistLoger()
@@ -155,7 +179,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
             if (type <= DebugType)
             {
-                mbrSocket.Send(Encoding.UTF8.GetBytes(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, log.ToString())));
+                mbrSocket.Send(Encoding.UTF8.GetBytes(string.Format("{0}{1}{2}", DateTime.Now, Environment.NewLine, BuildLog(log))));
             }
         }
         public override void RegistLoger()
@@ -182,7 +206,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
             if (type <= DebugType)
             {
-                Writer.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, type, log));
+                Writer.WriteLine(string.Format("{0}\t{1}\t{2}", DateTime.Now, type, BuildLog(log)));
                 Writer.Flush();
             }
         }
