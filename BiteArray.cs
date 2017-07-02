@@ -397,7 +397,7 @@ namespace TEArts.Etc.CollectionLibrary
             {
                 for (int i = 0; i < bytes.Length; i++)
                 {
-                    r = string.Format("{0}{1}{2}", r, bytes[i]);
+                    r = string.Format("{0}{1}{2:x}", r, splite, bytes[i]);
                 }
                 result = r;
             }
