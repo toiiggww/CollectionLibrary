@@ -10,7 +10,7 @@ namespace TEArts.Etc.CollectionLibrary
         public static string ReadAppConfig(string node, string value)
         {
             //string s = ConfigurationManager.AppSettings.Get(node);
-            string s="";
+            string s = string.Empty;
             if (ConfigurationManager.AppSettings.AllKeys.Contains<string>(node))
             {
                 s = ConfigurationManager.AppSettings[node];

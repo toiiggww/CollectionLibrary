@@ -27,6 +27,10 @@ namespace TEArts.Etc.CollectionLibrary
         public static int ObjectDeeps { get; set; } = 3;
         public static string BuildLog(object o, int level = 0)
         {
+            if (o == null)
+            {
+                return "[NulL]";
+            }
             if (level > ObjectDeeps)
             {
                 return o.ToString();
@@ -39,11 +43,22 @@ namespace TEArts.Etc.CollectionLibrary
             level++;
             Type t = o.GetType();
             PropertyInfo[] ps = t.GetProperties();
-            sb.AppendFormat("{0}Type : {0}", '\t'.Repeat(level), t.FullName);
+            sb.AppendFormat("{0}Type : {0}", "  ".Repeat(level), t.FullName);
             string generic = string.Empty;
             foreach (PropertyInfo p in ps)
             {
-                sb.AppendFormat("{0}{1} {2} {3}", '\t'.Repeat(level), p.DeclaringType.GenericDeclare(), p.Name, p.DeclaringType.IsBaseType() ? p.GetValue(o, null) : Environment.NewLine + BuildLog(p.GetValue(o, null), level + 1));
+                try
+                {
+                    sb.AppendFormat(
+                        "{0}{1} {2} {3}{4}",
+                        "  ".Repeat(level),
+                        p.DeclaringType.GenericDeclare(),
+                        p.Name,
+                        p.DeclaringType.IsBaseType() ? p.GetValue(o, null) : Environment.NewLine + BuildLog(p.GetValue(o, null), level + 1),
+                        Environment.NewLine
+                    );
+                }
+                catch { }
             }
             return sb.ToString();
         }
@@ -54,7 +69,7 @@ namespace TEArts.Etc.CollectionLibrary
         {
 
         }
-        private static object mbrOutLocker = new object();
+        private static readonly object mbrOutLocker = new object();
         private static ConsoleLoger mbrInstance;
         public static ConsoleLoger Instance
         {
@@ -120,7 +135,10 @@ namespace TEArts.Etc.CollectionLibrary
                 {
                     Console.WriteLine("{0}\t{1}\t{2}", DateTime.Now, type, s[i]);
                 }
-                Console.Write("{0}\t{1}\t{2}", DateTime.Now, type, s[s.Length - 1]);
+                if (s.Length > 0)
+                {
+                    Console.Write("{0}\t{1}\t{2}", DateTime.Now, type, s[s.Length - 1]);
+                }
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine();
@@ -128,26 +146,26 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public override void RegistLoger()
         {
-            Debuger.Loger.AddLoger("Console",this);
+            Debuger.Loger.AddLoger("Console", this);
         }
     }
     public class EventsLoger : DebugerLoger
     {
-        private static Dictionary<string, System.Diagnostics.EventLog> mbrEvents;
-        private System.Diagnostics.EventLog mbrLoger;
+        private static Dictionary<string, EventLog> mbrEvents;
+        private EventLog mbrLoger;
         public EventsLoger(string source, string name)
         {
             if (mbrEvents == null)
             {
-                mbrEvents = new Dictionary<string, System.Diagnostics.EventLog>();
+                mbrEvents = new Dictionary<string, EventLog>();
             }
             if (!mbrEvents.ContainsKey(name))
             {
-                if (!System.Diagnostics.EventLog.SourceExists(name))
+                if (!EventLog.SourceExists(name))
                 {
-                    System.Diagnostics.EventLog.CreateEventSource(source, name);
+                    EventLog.CreateEventSource(source, name);
                 }
-                mbrLoger = new System.Diagnostics.EventLog();
+                mbrLoger = new EventLog();
                 mbrLoger.Source = source;
                 mbrLoger.Log = name;
                 mbrEvents.Add(source, mbrLoger);
@@ -301,11 +319,11 @@ namespace TEArts.Etc.CollectionLibrary
         {
             DebugInfoInternal(message, type);
         }
-        public void DebugInfo(string formater, params object[] args)
+        public void Info(string formater, params object[] args)
         {
-            DebugInfo(DebugType.Info, formater == null ? "" : formater, args);
+            DebugInfo(DebugType.Info, formater == null ? string.Empty : formater, args);
         }
-        public void DebugInfo(DebugType type,string formater, params object [] args)
+        public void DebugInfo(DebugType type, string formater, params object[] args)
         {
             try
             {
@@ -320,7 +338,7 @@ namespace TEArts.Etc.CollectionLibrary
                 }
             }
         }
-        public void DebugInfo(object o) { DebugInfoInternal(o, DebugType.Info); }
+        public void Info(object o) { DebugInfoInternal(o, DebugType.Info); }
         public void Error(string formater, params object[] args)
         {
             DebugInfo(DebugType.Error, formater, args);

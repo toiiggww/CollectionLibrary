@@ -6,13 +6,13 @@ using System.Runtime.InteropServices;
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("BiteLibrary")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A library for some untitl")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("TEArt's Co., LTD.")]
 [assembly: AssemblyProduct("BiteLibrary")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyTrademark("Toiiggww")]
+[assembly: AssemblyCulture("zh-cn")]
 
 // 将 ComVisible 设置为 false 使此程序集中的类型
 // 对 COM 组件不可见。如果需要从 COM 访问此程序集中的类型，

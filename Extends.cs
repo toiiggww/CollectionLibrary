@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace TEArts.Etc.CollectionLibrary
 {
@@ -15,7 +16,8 @@ namespace TEArts.Etc.CollectionLibrary
             typeof(sbyte), typeof(short), typeof(string),
             typeof(TimeSpan), typeof(Type), typeof(uint),
             typeof(ushort), typeof(ulong), typeof(UIntPtr),
-            typeof(void)
+            typeof(void), typeof(FieldInfo), typeof(PropertyInfo),
+            typeof(MethodInfo), typeof(Exception)
         };
         public static bool IsBaseType(this Type t) { return BaseTypes.Contains(t); }
         public static bool IsBaseType(this object o) { return o.GetType().IsBaseType(); }
@@ -24,9 +26,9 @@ namespace TEArts.Etc.CollectionLibrary
             if (t.IsGenericType)
             {
                 string decl = string.Empty;
-                foreach (Type g in t.GetGenericParameterConstraints())
+                foreach (Type g in t.GetGenericArguments())
                 {
-                    decl += (decl == string.Empty ? string.Empty : ", ") + (g.IsGenericType ? g.GenericDeclar() : g.Name);
+                    decl += (decl == string.Empty ? string.Empty : ", ") + (g.IsGenericType ? g.GenericDeclare() : g.Name);
                 }
                 return t.Name + "<" + decl + ">";
             }
@@ -48,13 +50,28 @@ namespace TEArts.Etc.CollectionLibrary
             {
                 return value;
             }
-            string ret = value;
+            StringBuilder ret = new StringBuilder(value);
             for (int i = 0; i < repeat; i++)
             {
-                ret += spliter + value;
+                ret.AppendFormat("{0}{1}", spliter, value);
             }
-            return ret;
+            return ret.ToString();
         }
         public static string Repeat(this char value, int repeat, string spliter = "") { return value.ToString().Repeat(repeat, spliter); }
+    }
+
+    public static class ArrayExtends
+    {
+        public static string Concate(this Array ary, string spliter = ", ")
+        {
+            string ret = string.Empty;
+            StringBuilder sb = new StringBuilder();
+            foreach (var i in ary)
+            {
+                sb.AppendFormat("{0}{1}", i, spliter);
+            }
+            ret = sb.ToString().TrimEnd(spliter.ToCharArray());
+            return ret;
+        }
     }
 }

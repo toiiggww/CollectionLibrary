@@ -92,7 +92,7 @@ namespace TEArts.Etc.CollectionLibrary
         public virtual INode<T, Q> Create(IItem i) { throw new NotImplementedException(); }
         public override string ToString()
         {
-            string s = "";
+            string s = string.Empty;
             //r = (Parent == null ? "+-" : Parent.ToString());
             foreach (var n in Child.Values)
             {
