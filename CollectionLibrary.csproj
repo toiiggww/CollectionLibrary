@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TEArts.Etc.CollectionLibrary</RootNamespace>
     <AssemblyName>TEArts.Etc.CollectionLibrary</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SccProjectName>
@@ -66,8 +66,10 @@
     <Compile Include="Question.Designer.cs">
       <DependentUpon>Question.cs</DependentUpon>
     </Compile>
+    <Compile Include="TaskExtends.cs" />
     <Compile Include="TimeOutQueue.cs" />
     <Compile Include="Tree.cs" />
+    <Compile Include="WaitQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DialogFormBase.resx">
@@ -80,9 +82,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\RRMM\packages\Newtonsoft.Json.10.0.3\lib\net35\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
