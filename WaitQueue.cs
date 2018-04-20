@@ -63,12 +63,10 @@ namespace TEArts.Etc.CollectionLibrary
                 OnQueueFull?.Invoke(this, new QueueFullEventArgs<T>() { Dequeued = value, Max = MaxSize });
             }
             base.Enqueue(item);
-            if (Count <= 5 || 0 == Count % (MaxCountOfDequeue / 20))
+            if (Count <= 5 || (Count > (MaxCountOfDequeue / 20) && 0 == Count % (MaxCountOfDequeue / 20)))
             {
                 WaitHandle.Set();
             }
-            WaitHandle.Set();
->>>>>>> 5f8c8f281847836c2098b1c1859678c4fea72660
         }
         public Task<List<T>> Dequeue(int count = -1, int millisecondsTimeout = -1)
         {
