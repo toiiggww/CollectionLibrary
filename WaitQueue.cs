@@ -67,8 +67,6 @@ namespace TEArts.Etc.CollectionLibrary
             {
                 WaitHandle.Set();
             }
-            WaitHandle.Set();
->>>>>>> 5f8c8f281847836c2098b1c1859678c4fea72660
         }
         public Task<List<T>> Dequeue(int count = -1, int millisecondsTimeout = -1)
         {
