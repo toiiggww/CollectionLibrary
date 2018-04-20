@@ -347,5 +347,10 @@ namespace TEArts.Etc.CollectionLibrary
         {
             DebugInfo(DebugType.Warning, formater, args);
         }
+
+        public void DebugInfo(string info)
+        {
+            DebugInfo(DebugType.Info, info);
+        }
     }
 }
