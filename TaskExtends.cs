@@ -8,11 +8,11 @@ namespace TEArts.Etc.CollectionLibrary
 {
     public static class TaskExtends
     {
-        public static Task<T> FromResult<T>(this Task<T> task, T value)
+        public static async Task<T> FromResult<T>(T value)
         {
             TaskCompletionSource<T> source = new TaskCompletionSource<T>();
             source.SetResult(value);
-            return source.Task;
+            return await source.Task;
         }
     }
 }

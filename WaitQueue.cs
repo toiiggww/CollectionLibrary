@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,6 +12,15 @@ namespace TEArts.Etc.CollectionLibrary
         private EventHandler<QueueFullEventArgs<T>> OnQueueFull;
 
         public WaitQueue(CancellationToken cancelToken) : this(-1, cancelToken) { }
+
+        public void Clear()
+        {
+            while (Count > 0)
+            {
+                TryDequeue(out T _);
+            }
+        }
+
         public WaitQueue(int max, CancellationToken cancelToken) // : base(max > 0 ? max : 4)
         {
             MaxSize = max;
@@ -43,10 +50,7 @@ namespace TEArts.Etc.CollectionLibrary
             {
                 return t;
             }
-            if (Count == 0)
-            {
-                WaitHandle.WaitOne(millisecondsTimeout);
-            }
+            Wait(millisecondsTimeout);
             if (CancelToken.IsCancellationRequested)
             {
                 return t;
@@ -68,13 +72,13 @@ namespace TEArts.Etc.CollectionLibrary
                 WaitHandle.Set();
             }
         }
-        public Task<List<T>> Dequeue(int count = -1, int millisecondsTimeout = -1)
+        public async Task<List<T>> Dequeue(int count = -1, int millisecondsTimeout = -1)
         {
-            return this.Dequeue(null, count, -1);
+            return await this.Dequeue(null, count, millisecondsTimeout);
         }
-        public Task<List<T>> Dequeue(List<T> value, int count, int millisecondsTimeout)
+        public async Task<List<T>> Dequeue(List<T> value, int count, int millisecondsTimeout)
         {
-            return Task.Factory.StartNew(() =>
+            return await Task.Factory.StartNew(() =>
             {
                 if (value == null)
                 {
@@ -155,5 +159,4 @@ namespace TEArts.Etc.CollectionLibrary
         public int Max { get; set; }
         public T Dequeued { get; set; }
     }
-
 }
