@@ -45,7 +45,7 @@ namespace TEArts.Etc.CollectionLibrary
             int s = GetInt(new byte[] { bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3] });
             if (s == 0)
             {
-                return "";
+                return string.Empty;
             }
             else if (s > 0)
             {
@@ -274,21 +274,21 @@ namespace TEArts.Etc.CollectionLibrary
         public static string ArrayToHexString(byte[] bytes)
         {
             //return AToString(b, b.Length);
-            //string r = "";
+            //string r = string.Empty;
             //for (int i = 0; i < b.Length; i++)
             //{
             //    r = string.Format("{0}{1:X2}", r, b[i]);
             //}
             //return r;
-            return ArrayToHexString(bytes, bytes.Length, "");
+            return ArrayToHexString(bytes, bytes.Length, string.Empty);
         }
         public static string ArrayToHexString(byte[] bytes, int L)
         {
-            return ArrayToHexString(bytes, L, "");
+            return ArrayToHexString(bytes, L, string.Empty);
         }
         public static string ArrayToHexString(byte[] bytes, int L, string split)
         {
-            string r = "";
+            string r = string.Empty;
             for (int i = 0; i < L; i++)
             {
                 r = string.Format("{0}{1}{2:X2}", r, split, bytes[i]);
@@ -405,7 +405,7 @@ namespace TEArts.Etc.CollectionLibrary
         }
         public static byte[] FromString(string str)
         {
-            return FromString(str, "");
+            return FromString(str, string.Empty);
         }
         public static byte[] FromString(string str, string split)
         {
@@ -421,16 +421,17 @@ namespace TEArts.Etc.CollectionLibrary
         {
             if (bytes == null)
             {
-                return "";
+                return string.Empty;
             }
-            string r = "", b = "", s = "";
-            r = string.Format("{0}{1}Index \\ Offset  ", r, Environment.NewLine);
+            string r = string.Empty, b = string.Empty, s = string.Empty;
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("{0}{1}Index \\ Offset  ", r, Environment.NewLine);
             int i = 0, j = 0;
             for (; i < 16; i++)
             {
-                r = string.Format("{0} _{1:X}", r, i);
+                sb.AppendFormat("{0} _{1:X}", r, i);
             }
-            r = r + " [_____string_____]" + Environment.NewLine;
+            sb.AppendFormat(" [_____string_____]{0}", Environment.NewLine);
             i = bytes.Length / 16;
             if (i > 0)
             {
@@ -441,9 +442,9 @@ namespace TEArts.Etc.CollectionLibrary
                         b = string.Format("{0} {1:X2}", b, bytes[j]);
                         s = string.Format("{0}{1}", s, (bytes[j] == 0 ? '.' : ((bytes[j] == 0x0a || bytes[j] == 0x0d || bytes[j] == 0x08 || bytes[j] == 0x09 || bytes[j] == 0x7f) ? '_' : (char)bytes[j])));
                     }
-                    r = string.Format("{0}{1:X11}_ |  {2}  {3:50}{4}", r, k, b, s, Environment.NewLine);
-                    b = "";
-                    s = "";
+                    sb.AppendFormat("{0}{1:X11}_ |  {2}  {3:50}{4}", r, k, b, s, Environment.NewLine);
+                    b = string.Empty;
+                    s = string.Empty;
                     if (i > 0 && k == i - 1)
                     {
                         for (j = (k + 1) * 16; j < bytes.Length; j++)
@@ -456,7 +457,7 @@ namespace TEArts.Etc.CollectionLibrary
                             b = string.Format("{0}   ", b);
                         }
                         k++;
-                        r = string.Format("{0}{1:X11}_ |  {2}  {3:50}{4}", r, k, b, s, Environment.NewLine);
+                        sb.AppendFormat("{0}{1:X11}_ |  {2}  {3:50}{4}", r, k, b, s, Environment.NewLine);
                     }
                 }
             }
@@ -471,9 +472,9 @@ namespace TEArts.Etc.CollectionLibrary
                 {
                     b = string.Format("{0}   ", b);
                 }
-                r = string.Format("{0}{1:X11}_ |  {2}  {3:50}{4}", r, 0, b, s, Environment.NewLine);
+                sb.AppendFormat("{0}{1:X11}_ |  {2}  {3:50}{4}", r, 0, b, s, Environment.NewLine);
             }
-            return r;
+            return sb.ToString();
         }
         //public static byte[] GetBytes(string str)
         //{

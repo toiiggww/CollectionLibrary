@@ -12,6 +12,7 @@ namespace TEArts.Etc.CollectionLibrary
     {
         private Queue<TEArtsType> mbrPooler;
         private AutoResetEvent mbrEmptyLocker;
+        private int mbrMaxSize;
         private int mbrIndexer;
         private int mbrStarter;
         private int mbrMaxpean;
@@ -39,11 +40,25 @@ namespace TEArts.Etc.CollectionLibrary
             try { return mbrPooler.Dequeue(); }
             catch { return default(TEArtsType); }
         }
+        public TEArtsType[] Items
+        {
+            get
+            {
+                TEArtsType[] i = new TEArtsType[mbrPooler.Count];
+                mbrPooler.CopyTo(i, 0);
+                return i;
+            }
+        }
         public TEArtsType PopupNow( ) { waiteTime = 10; mbrEmptyLocker.Set(); return Popup(); }
         public int Pushin(TEArtsType tt)
         {
+            if (mbrPooler.Count == mbrMaxSize)
+            {
+                TEArtsType lost = mbrPooler.Dequeue();
+                ItemLosted?.Invoke(this, new ItemLostEventArgs<TEArtsType>() { LostItem = lost });
+            }
             mbrPooler.Enqueue(tt);
-            if (mbrPooler.Count >= 1)
+            if (mbrPooler.Count == 1)
             {
                 mbrEmptyLocker.Set();
             }
@@ -66,6 +81,7 @@ namespace TEArts.Etc.CollectionLibrary
         public Pooler(int size, int index, int max)
         {
             mbrPooler = new Queue<TEArtsType>(size);
+            mbrMaxSize = size;
             mbrIndexer = index;
             mbrMaxpean = max;
             mbrStarter = index;
@@ -80,5 +96,12 @@ namespace TEArts.Etc.CollectionLibrary
             mbrPooler.CopyTo(r, 0);
             return r;
         }
+
+        public EventHandler<ItemLostEventArgs<TEArtsType>> ItemLosted;
+    }
+
+    public class ItemLostEventArgs<TEArtsType> : EventArgs
+    {
+        public TEArtsType LostItem { get; internal set; }
     }
 }

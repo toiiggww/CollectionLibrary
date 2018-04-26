@@ -30,7 +30,7 @@ namespace TEArts.Etc.CollectionLibrary
                 {
                     decl += (decl == string.Empty ? string.Empty : ", ") + (g.IsGenericType ? g.GenericDeclare() : g.Name);
                 }
-                return t.Name + "<" + decl + ">";
+                return t.Name + " < " + decl + " > ";
             }
             else
             {

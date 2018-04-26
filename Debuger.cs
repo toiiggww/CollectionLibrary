@@ -54,7 +54,7 @@ namespace TEArts.Etc.CollectionLibrary
                         "  ".Repeat(level),
                         p.DeclaringType.GenericDeclare(),
                         p.Name,
-                        p.DeclaringType.IsBaseType() ? p.GetValue(o, null) : Environment.NewLine + BuildLog(p.GetValue(o, null), level + 1),
+                        p.PropertyType.IsBaseType() ? "\t : " + p.GetValue(o, null) : Environment.NewLine + BuildLog(p.GetValue(o, null), level + 1),
                         Environment.NewLine
                     );
                 }
