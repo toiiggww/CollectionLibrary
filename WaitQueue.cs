@@ -72,48 +72,47 @@ namespace TEArts.Etc.CollectionLibrary
                 WaitHandle.Set();
             }
         }
-        public async Task<List<T>> Dequeue(int count = -1, int millisecondsTimeout = -1)
+
+        public List<T> Dequeue(int count = -1, int millisecondsTimeout = -1)
         {
-            return await this.Dequeue(null, count, millisecondsTimeout);
+            return Dequeue(null, count, millisecondsTimeout);
         }
-        public async Task<List<T>> Dequeue(List<T> value, int count, int millisecondsTimeout)
+
+        public List<T> Dequeue(List<T> value, int count, int millisecondsTimeout)
         {
-            return await Task.Factory.StartNew(() =>
+            if (value == null)
             {
-                if (value == null)
+                value = new List<T>();
+            }
+            if (count <= 0)
+            {
+                count = MaxCountOfDequeue;
+            }
+            T t = default(T);
+            millisecondsTimeout = Wait(millisecondsTimeout);
+            int c = 0;
+            while (c < count)
+            {
+                if (CancelToken.IsCancellationRequested)
                 {
-                    value = new List<T>();
+                    break;
                 }
-                if (count <= 0)
+                Wait(millisecondsTimeout);
+                if (CancelToken.IsCancellationRequested)
                 {
-                    count = MaxCountOfDequeue;
+                    break;
                 }
-                T t = default(T);
-                millisecondsTimeout = Wait(millisecondsTimeout);
-                int c = 0;
-                while (c < count)
+                if (TryDequeue(out t))
                 {
-                    if (CancelToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
-                    Wait(millisecondsTimeout);
-                    if (CancelToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
-                    if (TryDequeue(out t))
-                    {
-                        value.Add(t);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                    c++;
+                    value.Add(t);
                 }
-                return value;
-            });
+                else
+                {
+                    break;
+                }
+                c++;
+            }
+            return value;
         }
 
         private int Wait(int millisecondsTimeout)
