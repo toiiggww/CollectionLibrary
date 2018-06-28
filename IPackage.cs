@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace TEArts.Etc.CollectionLibrary
 {
-    public interface IPackage<T>
+    public interface IPackage
     {
-        T FromBuffer(byte[] buffer);
-        Enum PackageType { get; set; }
+        void FromBuffer(byte[] buffer);
+        int PackageType { get; }
         byte[] ToBytes();
     }
 }

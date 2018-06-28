@@ -73,5 +73,6 @@ namespace TEArts.Etc.CollectionLibrary
             ret = sb.ToString().TrimEnd(spliter.ToCharArray());
             return ret;
         }
+
     }
 }
