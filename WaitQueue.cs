@@ -9,7 +9,7 @@ namespace TEArts.Etc.CollectionLibrary
     public class WaitQueue<T> : ConcurrentQueue<T>
     {
         private CancellationToken mbrCancelToken;
-        private EventHandler<QueueFullEventArgs<T>> OnQueueFull;
+        public event EventHandler<QueueFullEventArgs<T>> OnQueueFull;
 
         public WaitQueue(CancellationToken cancelToken) : this(-1, cancelToken) { }
 
@@ -97,7 +97,7 @@ namespace TEArts.Etc.CollectionLibrary
                 {
                     break;
                 }
-                Wait(millisecondsTimeout);
+                millisecondsTimeout = Wait(millisecondsTimeout);
                 if (CancelToken.IsCancellationRequested)
                 {
                     break;
