@@ -1,11 +1,11 @@
-﻿using System.Configuration;
+﻿using Newtonsoft.Json;
+using System.Configuration;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace TEArts.Etc.CollectionLibrary
 {
-    public class ConfigService
+    public class JsonConfigService
     {
         public static string ReadAppConfig(string node, string value)
         {

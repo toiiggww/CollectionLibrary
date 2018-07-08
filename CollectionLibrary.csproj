@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4B32327A-0CD1-46A4-8A88-B33B23682AA8}</ProjectGuid>
+    <ProjectGuid>{7BF3B1A8-1A9C-4690-AE68-06B8AF52DFCC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TEArts.Etc.CollectionLibrary</RootNamespace>
@@ -45,10 +45,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ActivatorHelper.cs" />
+    <Compile Include="AppConfigService.cs" />
     <Compile Include="BiteArray.cs" />
+    <Compile Include="ByteExtends.cs" />
     <Compile Include="ByteFinger.cs" />
     <Compile Include="GenericEventArgs.cs" />
-    <Compile Include="ConfigService.cs" />
+    <Compile Include="JsonConfigService.cs" />
     <Compile Include="DBHelper.cs" />
     <Compile Include="Debuger.cs" />
     <Compile Include="DialogFormBase.cs">
@@ -86,8 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\项目\MQTT\MQTT\packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />

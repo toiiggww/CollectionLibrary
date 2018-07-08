@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace TEArts.Etc.CollectionLibrary
 {
@@ -17,8 +16,12 @@ namespace TEArts.Etc.CollectionLibrary
         {
             while (Count > 0)
             {
-                TryDequeue(out T _);
+                TryDequeue(out T x);
+                x = default(T);
             }
+            WaitHandle.Set();
+            MaxSize = 0;
+            CancellationTokenSource.CreateLinkedTokenSource(CancelToken).Cancel();
         }
 
         public WaitQueue(int max, CancellationToken cancelToken) // : base(max > 0 ? max : 4)
