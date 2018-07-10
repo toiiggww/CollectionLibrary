@@ -75,4 +75,20 @@ namespace TEArts.Etc.CollectionLibrary
         }
 
     }
+
+    public static class ByteArrayExtends
+    {
+        public static bool GetBit(this byte[] array, int index, int offset)
+        {
+            if (index >= array.Length || index < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+            if (offset > 8 || offset < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+            return (array[index] & (1 << offset)) >> offset == 1;
+        }
+    }
 }
